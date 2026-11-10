@@ -5,7 +5,7 @@ import SyncCore
 @main
 struct ICloudSyncAssistantApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var model = SyncAssistantModel()
+    @StateObject private var model = SyncAssistantModel(dependencies: ScreenshotMode.current?.dependencies ?? .live)
 
     var body: some Scene {
         WindowGroup("iCloud Sync Assistant") {
@@ -29,6 +29,10 @@ struct ICloudSyncAssistantApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        ScreenshotMode.current?.applyAppearance()
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true
     }

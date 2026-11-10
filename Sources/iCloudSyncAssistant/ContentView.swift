@@ -24,7 +24,12 @@ struct ContentView: View {
             IPhoneGuideView()
         }
         .task {
-            await model.runChecks()
+            if let screenshot = ScreenshotMode.current {
+                await model.syncNow()
+                await screenshot.capture()
+            } else {
+                await model.runChecks()
+            }
         }
     }
 }
