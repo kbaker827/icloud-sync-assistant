@@ -75,10 +75,15 @@ scripts/package-app.sh         # build dist/iCloud Sync Assistant.app and a zip
 
 ```
 Sources/SyncCore/            Logic: checks, account and iCloud Drive readers, service restart, view model
-Sources/iCloudSyncAssistant/ SwiftUI app: dashboard, cards, help sheet
+Sources/iCloudSyncAssistant/ SwiftUI app: dashboard, cards, help sheet, screenshot mode
+docs/images/                 Logo and README screenshots (made by the Screenshots workflow)
 Tests/SyncCoreTests/         Unit tests (CI requires 80%+ line coverage of SyncCore)
 scripts/                     Packaging, icon generation, coverage gate
 ```
+
+### Refreshing the README images
+
+The logo and screenshots are rendered on a real Mac by the **Screenshots** workflow, using built-in demo data. Run it from the Actions tab (or push to a `docs/` branch), download the `readme-images` artifact, and copy the PNGs into `docs/images/`.
 
 ### Releasing
 
