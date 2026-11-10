@@ -7,25 +7,39 @@ struct ContentView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
-                SyncHeroView()
-                HealthSection()
-                ServicesSection()
-                HelpSection(showingIPhoneGuide: $showingIPhoneGuide)
-                FooterNote()
-            }
-            .padding(.horizontal, 32)
-            .padding(.vertical, 28)
-            .frame(maxWidth: 1100)
-            .frame(maxWidth: .infinity)
+            DashboardView(showingIPhoneGuide: $showingIPhoneGuide)
+                .frame(maxWidth: .infinity)
         }
         .background(Palette.page)
         .sheet(isPresented: $showingIPhoneGuide) {
             IPhoneGuideView()
         }
         .task {
-            await model.runChecks()
+            if let screenshot = ScreenshotMode.current {
+                await model.syncNow()
+                await screenshot.capture(model: model)
+            } else {
+                await model.runChecks()
+            }
         }
+    }
+}
+
+/// Every section of the dashboard, without scrolling, so it can also be rendered whole for screenshots.
+struct DashboardView: View {
+    @Binding var showingIPhoneGuide: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 32) {
+            SyncHeroView()
+            HealthSection()
+            ServicesSection()
+            HelpSection(showingIPhoneGuide: $showingIPhoneGuide)
+            FooterNote()
+        }
+        .padding(.horizontal, 32)
+        .padding(.vertical, 28)
+        .frame(maxWidth: 1100)
     }
 }
 

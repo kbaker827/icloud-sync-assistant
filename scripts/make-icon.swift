@@ -40,18 +40,28 @@ let gradient = NSGradient(
 )
 gradient?.draw(in: shape, angle: -90)
 
-let symbolNames = ["arrow.triangle.2.circlepath.icloud.fill", "arrow.clockwise.icloud.fill", "icloud.fill"]
-let configuration = NSImage.SymbolConfiguration(pointSize: 420, weight: .semibold)
-    .applying(NSImage.SymbolConfiguration(paletteColors: [.white]))
-let symbol = symbolNames.lazy
-    .compactMap { NSImage(systemSymbolName: $0, accessibilityDescription: nil)?.withSymbolConfiguration(configuration) }
-    .first
-
-if let symbol {
+/// Draws an SF Symbol in a single colour, centred on the canvas and nudged by `offset`.
+func drawSymbol(_ name: String, pointSize: CGFloat, weight: NSFont.Weight, color: NSColor, offset: NSPoint = .zero) {
+    let configuration = NSImage.SymbolConfiguration(pointSize: pointSize, weight: weight)
+        .applying(NSImage.SymbolConfiguration(paletteColors: [color]))
+    guard let symbol = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
+        .withSymbolConfiguration(configuration) else {
+        FileHandle.standardError.write(Data("missing symbol \(name)\n".utf8))
+        exit(1)
+    }
     let symbolSize = symbol.size
-    let origin = NSPoint(x: (CGFloat(size) - symbolSize.width) / 2, y: (CGFloat(size) - symbolSize.height) / 2)
+    let origin = NSPoint(
+        x: (CGFloat(size) - symbolSize.width) / 2 + offset.x,
+        y: (CGFloat(size) - symbolSize.height) / 2 + offset.y
+    )
     symbol.draw(in: NSRect(origin: origin, size: symbolSize))
 }
+
+// A white cloud with blue sync arrows inside it.
+drawSymbol("icloud.fill", pointSize: 470, weight: .regular, color: .white)
+drawSymbol("arrow.triangle.2.circlepath", pointSize: 190, weight: .bold,
+           color: NSColor(srgbRed: 0.05, green: 0.40, blue: 0.92, alpha: 1),
+           offset: NSPoint(x: 0, y: -22))
 
 NSGraphicsContext.restoreGraphicsState()
 

@@ -1,0 +1,55 @@
+name: Screenshots
+
+# Renders README images (logo + app screenshots with demo data) on a real Mac.
+# Download the "readme-images" artifact and commit its files to docs/images/.
+on:
+  workflow_dispatch:
+  push:
+    branches: ["docs/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package app
+        run: scripts/package-app.sh
+
+      - name: Render logo
+        run: |
+          mkdir -p out
+          swift scripts/make-icon.swift out/logo.png
+          sips -z 256 256 out/logo.png --out out/logo-256.png >/dev/null
+
+      - name: Capture screenshots
+        run: |
+          APP="$PWD/dist/iCloud Sync Assistant.app"
+          shoot() {
+            echo "--- $1"
+            status=0
+            # Launch through LaunchServices so the app gets a proper GUI session.
+            perl -e 'alarm shift; exec @ARGV' 120 open -W -n \
+              --env "ICSA_SCREENSHOT=$PWD/out/$1.png" --env "ICSA_SCENARIO=$2" \
+              --env "ICSA_APPEARANCE=$3" --env "ICSA_HEIGHT=$4" \
+              --stdout "$PWD/out/$1.log" --stderr "$PWD/out/$1.log" \
+              "$APP" || status=$?
+            echo "exit status $status"
+            cat "out/$1.log" || true
+            test -s "out/$1.png"
+          }
+          shoot dashboard-light good light ""
+          shoot dashboard-dark good dark ""
+          shoot needs-attention attention light 620
+          ls -la out
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: readme-images
+          path: out/*.png
+          if-no-files-found: error
