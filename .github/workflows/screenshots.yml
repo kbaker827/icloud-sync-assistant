@@ -4,6 +4,8 @@ name: Screenshots
 # Download the "readme-images" artifact and commit its files to docs/images/.
 on:
   workflow_dispatch:
+  push:
+    branches: ["docs/**"]
 
 permissions:
   contents: read
