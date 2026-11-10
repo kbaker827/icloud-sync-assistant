@@ -41,6 +41,10 @@ public enum Checks {
             return CheckResult(kind: .iCloudDrive, title: title, status: .good,
                                detail: "iCloud Drive is set up on this Mac.")
         }
+        if driveEnabled == .on {
+            return CheckResult(kind: .iCloudDrive, title: title, status: .warning,
+                               detail: "iCloud Drive is turned on, but its folder isn't on this Mac yet. Restart the Mac, or turn iCloud Drive off and on again in Apple Account Settings > iCloud.")
+        }
         return CheckResult(kind: .iCloudDrive, title: title, status: .warning,
                            detail: "iCloud Drive is turned off on this Mac, so files won't sync. Turn it on in Apple Account Settings > iCloud.")
     }

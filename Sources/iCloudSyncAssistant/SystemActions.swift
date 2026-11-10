@@ -5,11 +5,8 @@ import SyncCore
 enum SystemActions {
     static let systemStatusURL = URL(string: "https://www.apple.com/support/systemstatus/")
 
-    /// Settings URLs for the Apple Account pane: macOS 13+ first, then the older pane name.
-    static let appleAccountSettingsURLs = [
-        "x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings",
-        "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane",
-    ].compactMap(URL.init(string:))
+    /// The Apple Account pane in System Settings (macOS 13+).
+    static let appleAccountSettingsURL = URL(string: "x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings")
 
     static func open(_ service: ICloudService) {
         if service == .drive {
@@ -37,9 +34,8 @@ enum SystemActions {
     }
 
     static func openAppleAccountSettings() {
-        for url in appleAccountSettingsURLs where NSWorkspace.shared.open(url) {
-            return
-        }
+        guard let url = appleAccountSettingsURL else { return }
+        _ = NSWorkspace.shared.open(url)
     }
 
     static func openSystemStatus() {

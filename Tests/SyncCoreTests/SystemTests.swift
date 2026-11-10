@@ -89,6 +89,23 @@ final class DriveScannerTests: XCTestCase {
         XCTAssertTrue(summary.hasSyncInfo)
     }
 
+    func testCloudOnlyPlaceholdersCountedAndHiddenFoldersSkipped() throws {
+        let hiddenFolder = root.appendingPathComponent(".cache", isDirectory: true)
+        try FileManager.default.createDirectory(at: hiddenFolder, withIntermediateDirectories: true)
+        try Data("x".utf8).write(to: hiddenFolder.appendingPathComponent("inside.txt"))
+        let placeholder = root.appendingPathComponent(".Report.pdf.icloud")
+        try Data("x".utf8).write(to: placeholder)
+
+        XCTAssertEqual(DriveScanner.liveState(for: placeholder), ItemSyncState(isDownloaded: false))
+        XCTAssertTrue(DriveScanner.isHidden(hiddenFolder))
+        XCTAssertFalse(DriveScanner.isHidden(placeholder))
+
+        let summary = try XCTUnwrap(DriveScanner.scan(root: root))
+        XCTAssertEqual(summary.scanned, 4)
+        XCTAssertEqual(summary.cloudOnly, 1)
+        XCTAssertEqual(summary.unknown, 3)
+    }
+
     func testScanStopsAtLimit() throws {
         let summary = try XCTUnwrap(DriveScanner.scan(root: root, limit: 2) { _ in ItemSyncState() })
         XCTAssertEqual(summary.scanned, 2)

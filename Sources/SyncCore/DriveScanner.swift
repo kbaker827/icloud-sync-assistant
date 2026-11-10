@@ -78,8 +78,10 @@ public enum DriveScanner {
         let errorCounter = ErrorCounter()
         guard let enumerator = fileManager.enumerator(
             at: root,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles, .skipsPackageDescendants],
+            includingPropertiesForKeys: [.isDirectoryKey] + Array(syncKeys),
+            // Hidden files are filtered below instead, because macOS 13 stores
+            // cloud-only files as hidden ".name.icloud" placeholders.
+            options: [.skipsPackageDescendants],
             errorHandler: { _, _ in
                 errorCounter.count += 1
                 return true
@@ -89,6 +91,10 @@ public enum DriveScanner {
         var summary = DriveSummary()
         for case let url as URL in enumerator {
             let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
+            if isHidden(url) {
+                if isDirectory { enumerator.skipDescendants() }
+                continue
+            }
             if isDirectory { continue }
             if summary.scanned >= limit {
                 summary.reachedLimit = true
@@ -102,6 +108,9 @@ public enum DriveScanner {
 
     /// Reads iCloud sync attributes for one file. Returns `nil` when macOS doesn't say.
     public static func liveState(for url: URL) -> ItemSyncState? {
+        if isPlaceholder(url) {
+            return ItemSyncState(isDownloaded: false)
+        }
         guard
             let values = try? url.resourceValues(forKeys: syncKeys),
             values.isUbiquitousItem == true
@@ -113,6 +122,16 @@ public enum DriveScanner {
             isDownloaded: values.ubiquitousItemDownloadingStatus.map { $0 != .notDownloaded } ?? true,
             hasError: values.ubiquitousItemUploadingError != nil || values.ubiquitousItemDownloadingError != nil
         )
+    }
+
+    /// macOS 13 represents a cloud-only file as a hidden `.Name.ext.icloud` placeholder.
+    static func isPlaceholder(_ url: URL) -> Bool {
+        url.lastPathComponent.hasPrefix(".") && url.pathExtension == "icloud"
+    }
+
+    /// Hidden files and folders, except cloud-only placeholders, which count as real files.
+    static func isHidden(_ url: URL) -> Bool {
+        url.lastPathComponent.hasPrefix(".") && !isPlaceholder(url)
     }
 }
 

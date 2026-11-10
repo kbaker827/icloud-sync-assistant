@@ -50,6 +50,13 @@ final class ChecksTests: XCTestCase {
     func testDriveWarningWhenMissingOrOff() {
         XCTAssertEqual(Checks.iCloudDrive(folderExists: false, driveEnabled: .unknown).status, .warning)
         XCTAssertEqual(Checks.iCloudDrive(folderExists: true, driveEnabled: .off).status, .warning)
+        XCTAssertTrue(Checks.iCloudDrive(folderExists: false, driveEnabled: .off).detail.contains("turned off"))
+    }
+
+    func testDriveOnButFolderMissing() {
+        let result = Checks.iCloudDrive(folderExists: false, driveEnabled: .on)
+        XCTAssertEqual(result.status, .warning)
+        XCTAssertTrue(result.detail.contains("isn't on this Mac yet"))
     }
 
     // MARK: Pending files
