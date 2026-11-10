@@ -42,9 +42,9 @@ jobs:
             cat "out/$1.log" || true
             test -s "out/$1.png"
           }
-          shoot dashboard-light good light 1480
-          shoot dashboard-dark good dark 1480
-          shoot needs-attention attention light 900
+          shoot dashboard-light good light ""
+          shoot dashboard-dark good dark ""
+          shoot needs-attention attention light 620
           ls -la out
 
       - uses: actions/upload-artifact@v4
