@@ -1,8 +1,29 @@
-# iCloud Sync Assistant
+<p align="center">
+  <img src="docs/images/logo-256.png" width="128" height="128" alt="iCloud Sync Assistant logo">
+</p>
 
-A small Mac app with one big **Sync Now** button. It wakes up iCloud and shows in plain English whether anything is stopping your Mac and iPhone from staying in sync.
+<h1 align="center">iCloud Sync Assistant</h1>
 
-[![CI](https://github.com/kbaker827/icloud-sync-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/kbaker827/icloud-sync-assistant/actions/workflows/ci.yml)
+<p align="center">
+  A small Mac app with one big <b>Sync Now</b> button. It wakes up iCloud and shows in plain English whether anything is stopping your Mac and iPhone from staying in sync.
+</p>
+
+<p align="center">
+  <a href="https://github.com/kbaker827/icloud-sync-assistant/releases/latest"><b>Download for Mac</b></a> ·
+  <a href="https://github.com/kbaker827/icloud-sync-assistant/actions/workflows/ci.yml"><img src="https://github.com/kbaker827/icloud-sync-assistant/actions/workflows/ci.yml/badge.svg" alt="CI status" align="center"></a>
+</p>
+
+<p align="center">
+  <img src="docs/images/dashboard-light.png" width="720" alt="The iCloud Sync Assistant dashboard showing Everything looks good, six health checks and nine iCloud app cards">
+</p>
+
+## Screenshots
+
+| Dark mode | When something needs attention |
+| --- | --- |
+| <img src="docs/images/dashboard-dark.png" width="420" alt="The dashboard in dark mode"> | <img src="docs/images/needs-attention.png" width="420" alt="The dashboard warning that Low Power Mode is on and storage is running low"> |
+
+<sub>Screenshots use built-in demo data, not a real account.</sub>
 
 ## Download and install
 

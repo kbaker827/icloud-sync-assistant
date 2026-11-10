@@ -28,13 +28,18 @@ jobs:
 
       - name: Capture screenshots
         run: |
-          BIN="dist/iCloud Sync Assistant.app/Contents/MacOS/iCloudSyncAssistant"
+          APP="$PWD/dist/iCloud Sync Assistant.app"
           shoot() {
             echo "--- $1"
             status=0
-            ICSA_SCREENSHOT="$PWD/out/$1.png" ICSA_SCENARIO="$2" ICSA_APPEARANCE="$3" \
-              ICSA_HEIGHT="$4" perl -e 'alarm shift; exec @ARGV' 120 "$BIN" || status=$?
+            # Launch through LaunchServices so the app gets a proper GUI session.
+            perl -e 'alarm shift; exec @ARGV' 120 open -W -n \
+              --env "ICSA_SCREENSHOT=$PWD/out/$1.png" --env "ICSA_SCENARIO=$2" \
+              --env "ICSA_APPEARANCE=$3" --env "ICSA_HEIGHT=$4" \
+              --stdout "$PWD/out/$1.log" --stderr "$PWD/out/$1.log" \
+              "$APP" || status=$?
             echo "exit status $status"
+            cat "out/$1.log" || true
             test -s "out/$1.png"
           }
           shoot dashboard-light good light 1480
