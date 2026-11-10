@@ -27,11 +27,14 @@ extension SyncDependencies {
             "KEYCHAIN_SYNC": true,
             "MOBILE_DOCUMENTS": true,
         ]
-        var drive = DriveSummary()
-        drive.scanned = 1_284
-        drive.cloudOnly = 312
-        drive.uploading = isAllGood ? 0 : 3
-        drive.downloading = isAllGood ? 0 : 1
+        let drive: DriveSummary = {
+            var summary = DriveSummary()
+            summary.scanned = 1_284
+            summary.cloudOnly = 312
+            summary.uploading = isAllGood ? 0 : 3
+            summary.downloading = isAllGood ? 0 : 1
+            return summary
+        }()
         // The classic Apple demo time, so screenshots look the same on every run.
         let demoDate = Calendar.current.date(bySettingHour: 9, minute: 41, second: 0, of: Date()) ?? Date()
 
