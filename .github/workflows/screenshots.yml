@@ -30,8 +30,12 @@ jobs:
         run: |
           BIN="dist/iCloud Sync Assistant.app/Contents/MacOS/iCloudSyncAssistant"
           shoot() {
+            echo "--- $1"
+            status=0
             ICSA_SCREENSHOT="$PWD/out/$1.png" ICSA_SCENARIO="$2" ICSA_APPEARANCE="$3" \
-              ICSA_HEIGHT="$4" perl -e 'alarm shift; exec @ARGV' 120 "$BIN"
+              ICSA_HEIGHT="$4" perl -e 'alarm shift; exec @ARGV' 120 "$BIN" || status=$?
+            echo "exit status $status"
+            test -s "out/$1.png"
           }
           shoot dashboard-light good light 1480
           shoot dashboard-dark good dark 1480

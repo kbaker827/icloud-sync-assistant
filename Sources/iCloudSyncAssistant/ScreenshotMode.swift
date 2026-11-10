@@ -31,6 +31,7 @@ struct ScreenshotMode: Sendable {
 
     @MainActor
     func capture() async {
+        log("capturing \(NSApp.windows.count) window(s)")
         guard let window = NSApp.windows.first(where: { $0.contentView != nil }) else {
             fail("no window to capture")
             return
@@ -57,6 +58,10 @@ struct ScreenshotMode: Sendable {
         } catch {
             fail("could not write \(outputURL.path): \(error)")
         }
+    }
+
+    func log(_ message: String) {
+        FileHandle.standardError.write(Data("[screenshot] \(message)\n".utf8))
     }
 
     private func fail(_ message: String) {

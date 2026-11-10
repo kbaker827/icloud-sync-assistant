@@ -30,7 +30,20 @@ struct ICloudSyncAssistantApp: App {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
-        ScreenshotMode.current?.applyAppearance()
+        guard let screenshot = ScreenshotMode.current else { return }
+        screenshot.log("launching")
+        screenshot.applyAppearance()
+    }
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        guard let screenshot = ScreenshotMode.current else { return }
+        screenshot.log("launched with \(NSApp.windows.count) window(s)")
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        ScreenshotMode.current?.log("terminating")
+        return .terminateNow
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
