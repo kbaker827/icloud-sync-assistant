@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-package:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          sw_vers
+          swift --version
+
+      - name: Test (warnings are errors)
+        run: swift test --enable-code-coverage -Xswiftc -warnings-as-errors
+
+      - name: Enforce 80% coverage on SyncCore
+        run: scripts/check-coverage.sh 80
+
+      - name: Package universal app
+        run: scripts/package-app.sh
+
+      - name: Smoke-test the bundle
+        run: |
+          APP="dist/iCloud Sync Assistant.app"
+          test -x "$APP/Contents/MacOS/iCloudSyncAssistant"
+          test -s "$APP/Contents/Resources/AppIcon.icns"
+          plutil -extract CFBundleIdentifier raw "$APP/Contents/Info.plist"
+          lipo "$APP/Contents/MacOS/iCloudSyncAssistant" -verify_arch arm64 x86_64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iCloud-Sync-Assistant
+          path: dist/*.zip
+          if-no-files-found: error
